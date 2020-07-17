@@ -20,12 +20,11 @@ fn main() {
     println!("{}",result);
 
     println!("initialisation de matrice:");
-    let rows:u32=10;
-    let cols:u32=6;
+    let rows:u32=5;
+    let cols:u32=5;
     
 
     let mut mat=matrix::Matrix {
-        name:String::from("test_matrix"),
         nb_row:rows,
         nb_col:cols,
         val:matrix::null_matrix(rows as usize,cols as usize),
@@ -34,7 +33,16 @@ fn main() {
     mat.print();
 
     println!("remplissage diagonale:");
-    mat.fill_diag(1.234);
+    mat.fill_diag(2.0);
     mat.print();
+    //println!("val[1,1]={}",mat.get_val(1, 1));
+    //mat.set_val(1, 1, 3.14);
+    //println!("val[1,1]={}",mat.get_val(1, 1));
+    //mat.print();
+   
+    let mat2=&mat.mult(&mat);
+    mat2.print();
+
+
 
 }
