@@ -22,11 +22,11 @@ impl Matrix{
     }
 
     pub fn get_val(&self,row:u32,col:u32)->f32 {
-        return self.val[((row-1)*col+(col-1)) as usize];
+        return self.val[((row-1)*self.nb_col+(col-1)) as usize];
     }
 
     pub fn set_val(&mut self,row:u32,col:u32,value:f32) {
-        self.val[((row-1)*col+(col-1)) as usize]=value;
+        self.val[((row-1)*self.nb_col+(col-1)) as usize]=value;
     }
 
     pub fn fill_diag(&mut self,val:f32) {
@@ -53,8 +53,73 @@ impl Matrix{
             }
         }
 
-
         return res;
     }
 
+    pub fn get_determinant(&self)->Option<f32> {
+
+        let mut result:Option<f32>=None;
+
+        if self.nb_col==self.nb_row {
+            let mut det:f32=0.0;
+
+            if self.nb_row==2 {
+                det=self.get_val(1,1)*self.get_val(2,2)-self.get_val(2, 1)*self.get_val(1,2);
+            } else {
+                for i in 0..self.nb_row-1 {
+                    let temp:Matrix=self.extract_matrix(i+1, 1);
+
+                    let det:Option<f32>=temp.get_determinant();
+                    match det {
+                        Some(x)=>{
+                            match result {
+                                Some(y)=>result=Some(y+self.get_val(i+1, 1)*(-1f32.powi(i as i32))*x),
+                                None=>result=None,
+                            };
+                        },
+                        None=>result=None,
+                    };
+                    
+                    
+                }
+            }
+
+            result=Some(det);
+        }
+
+
+
+        return result;
+    } 
+
+    pub fn extract_matrix(&self,row:u32,col:u32)->Matrix {
+        let mut res=Matrix{
+            nb_row:self.nb_row-1,
+            nb_col:self.nb_col-1,
+            val:null_matrix((self.nb_row-1) as usize,(self.nb_col-1) as usize),
+        };
+
+
+        let mut decal_i:u32=0;
+        let mut decal_j:u32=0;
+
+
+        for i in 0..self.nb_row-2 {
+            if i==row-1 {
+                decal_i=1;
+            }
+            decal_j=0;
+
+            for j in 0..self.nb_col-2 {
+                if j==col-1 {
+                    decal_j=1;
+                }
+                res.set_val(i+1, j+1, self.get_val(i+decal_i+1, j+decal_j+1));
+            }
+
+        }
+    
+   
+    return res;
+    }
 }
