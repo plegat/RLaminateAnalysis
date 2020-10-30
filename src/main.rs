@@ -34,6 +34,8 @@ fn main() {
 
     println!("remplissage diagonale:");
     mat.fill_diag(2.0);
+    mat.set_val(1,cols,3.0);
+    mat.set_val(rows,1,4.0);
     mat.print();
     //println!("val[1,1]={}",mat.get_val(1, 1));
     //mat.set_val(1, 1, 3.14);
@@ -41,8 +43,38 @@ fn main() {
     //mat.print();
    
     let mat2=&mat.mult(&mat);
-    mat2.print();
+    println!("matrice multiplication:");
+    match mat2 {
+        Some(x)=>x.print(),
+        None=>println!("Problem on matrices sizes, {} rows for {} lines",&mat.nb_col,&mat.nb_row),
+    }
+    
+
+    let det=mat.get_determinant();
+    match det {
+        Some(x)=>println!("determinant: {}",x),
+        None=>println!("problem calculating determinant"),
+    }
+    
+    let mat_transpose=mat.transpose();
+    mat_transpose.print();
+    
+    match mat.invert() {
+        Some(inverse_mat)=>{
+            println!("Matrice inverse:");
+            inverse_mat.print();
+
+            println!("Verification:");
+            match mat.mult(&inverse_mat) {
+                Some(prod)=>prod.print(),
+                None=>println!("probleme de multiplication lors de la vérification..."),
+            }
+             
+            
 
 
+        },
+        None=>println!("problème d'inversion de la matrice..."),
+    }
 
 }
