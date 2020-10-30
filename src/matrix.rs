@@ -11,6 +11,14 @@ pub fn null_matrix(row:usize,col:usize)->Vec<f32> {
 
 
 impl Matrix{
+
+    pub fn new(nb_row:u32, nb_col:u32)->Matrix {
+        Matrix {
+            nb_row,
+            nb_col,
+            val:null_matrix(nb_row as usize,nb_col as usize),
+        }
+    }
     
     pub fn print(&self) {
         for n in 0..self.nb_row {
@@ -29,6 +37,12 @@ impl Matrix{
     pub fn set_val(&mut self,row:u32,col:u32,value:f32) {
         self.val[((row-1)*self.nb_col+(col-1)) as usize]=value;
     }
+
+    pub fn add_val(&mut self,row:u32,col:u32,value:f32) {
+        let old_value=self.get_val(row, col);
+        self.val[((row-1)*self.nb_col+(col-1)) as usize]=old_value+value;
+    }
+
 
     pub fn fill_diag(&mut self,val:f32) {
         for i in 0..std::cmp::min(self.nb_row,self.nb_col) {
