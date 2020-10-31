@@ -57,6 +57,7 @@ pub struct Laminate<'a> {
     nb:u32,
     stack:Vec<Ply<'a>>,
     abd_matrix: matrix::Matrix,
+    pub equiv_prop:Vec<f32>,
 }
 
 impl Laminate<'_> {
@@ -70,6 +71,7 @@ impl Laminate<'_> {
             nb: orient.len() as u32,
             stack: plies,
             abd_matrix:  matrix::Matrix::new(6,6),
+            equiv_prop: Vec::new(),
         }
 
     }
@@ -133,10 +135,6 @@ pub fn calculate_abd(&mut self) {
 
         let teta=ply.orient.to_radians();
 
-        println!("angle en degrés: {}",ply.orient);
-        println!("angle en radians: {}",teta);
-        
-
         let c=teta.cos();
         let s=teta.sin();
         let c2=c*c;
@@ -145,7 +143,8 @@ pub fn calculate_abd(&mut self) {
         t.val=vec!(c2,s2,-2.0*c*s,s2,c2,2.0*c*s,c*s,-c*s,c2-s2);
         t_inv.val=vec!(c2,s2,c*s,s2,c2,-c*s,-2.0*c*s,2.0*c*s,c2-s2);
         
-        let mut qxy=matrix::Matrix::new(3,3);
+        //let mut qxy=matrix::Matrix::new(3,3);
+        let  qxy:matrix::Matrix;
 
         match qlt.mult(&t_inv) {
             Some(qlt_tinv)=>{
@@ -175,6 +174,53 @@ pub fn calculate_abd(&mut self) {
         h=h+ep;
 
     }
+}
+
+pub fn calculate_equivalent_properties(&mut self) {
+
+    let mut e:f32=0.0;
+    
+    for ply in &self.stack {
+        e=e+ply.th;
+    }
+
+    match &self.abd_matrix.invert() {
+        Some(abd_inverse)=>{
+            //abd_inverse.print();
+
+            // push membrane properties
+            &self.equiv_prop.push(1.0/(e*abd_inverse.get_val(1,1)));
+            &self.equiv_prop.push(1.0/(e*abd_inverse.get_val(2,2)));
+            &self.equiv_prop.push(1.0/(e*abd_inverse.get_val(3,3)));
+            &self.equiv_prop.push(-abd_inverse.get_val(1,2)/abd_inverse.get_val(1,1));
+
+            //push bending properties
+            &self.equiv_prop.push(12.0/(e.powi(3)*abd_inverse.get_val(4,4)));
+            &self.equiv_prop.push(12.0/(e.powi(3)*abd_inverse.get_val(5,5)));
+            &self.equiv_prop.push(12.0/(e.powi(3)*abd_inverse.get_val(6,6)));
+            &self.equiv_prop.push(-abd_inverse.get_val(4,5)/abd_inverse.get_val(4,4));
+            
+
+
+        },
+        None=>println!("Problem during inversion"),
+    }
+}
+
+pub fn get_membrane_properties(&mut self)->Vec<f32> {
+    let mut memb:Vec<f32>=Vec::new();
+    for i in 0..4 {
+        memb.push(self.equiv_prop[i]);
+    }
+    memb
+}
+
+pub fn get_bending_properties(&mut self)->Vec<f32> {
+    let mut bend:Vec<f32>=Vec::new();
+    for i in 0..4 {
+        bend.push(self.equiv_prop[i+4]);
+    }
+    bend
 }
 
 }

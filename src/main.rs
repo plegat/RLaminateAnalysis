@@ -30,4 +30,22 @@ fn main() {
     lam1.calculate_abd();
     lam1.print_abd_matrix();
 
+    lam1.calculate_equivalent_properties();
+
+    println!("membrane properties:");
+    let memb=lam1.get_membrane_properties();
+    let bend=lam1.get_bending_properties();
+
+    for i in memb {
+        print!("{} /",i);
+    }
+    println!("");
+    println!("bending properties:");
+    for i in bend {
+        print!("{} /",i);
+    }
+    println!("");
+    
+
+
 }
