@@ -72,17 +72,32 @@ impl Matrix{
         };
 
         for i in 0..self.nb_row {
-            //println!("mult line {}",i+1);
             for j in 0..mat.nb_col {
-                //println!("mult col {}",j+1);
                 let mut som:f32=0.0;
                 for k in 0..self.nb_col {
-                    //println!("mult k+1 {}",k+1);
                     som=som+self.get_val(i+1, k+1)*mat.get_val(k+1, j+1);
-                    //println!("{}/{}/{}:{}, {} = {}",i,j,k,self.get_val(i+1, k+1),mat.get_val(k+1, j+1),som);
                 }
                 res.set_val(i+1, j+1, som);
             }
+        }
+
+        return Some(res);
+    }
+
+    pub fn mult_vector(&self,vect:&Vec<f32>)->Option<Vec<f32>> {
+
+        if self.nb_col!=vect.len() as u32 {
+            return None;
+        }
+
+        let mut res:Vec<f32>=Vec::new();
+
+        for i in 0..self.nb_row {
+                let mut som:f32=0.0;
+                for k in 0..self.nb_col {
+                    som=som+self.get_val(i+1, k+1)*vect[k as usize];
+                }
+                res.push(som);
         }
 
         return Some(res);
